@@ -3,6 +3,7 @@ import axios from "axios";
 const api = axios.create({
   baseURL:
     import.meta.env.VITE_API_BASE_URL ||
+    "http://localhost:8000" ||
     "https://hrms-backend-beige.vercel.app/",
 });
 import {
@@ -39,7 +40,7 @@ import {
 // Users
 function* fetchUsersWorker() {
   try {
-    const { data } = yield call(api.get, "/api/users");
+    const { data } = yield call(api.get, "/users");
     yield put(fetchUsersSuccess(data));
   } catch (e) {
     yield put(fetchUsersFailure(e.message));
@@ -48,7 +49,7 @@ function* fetchUsersWorker() {
 
 function* createUserWorker(action) {
   try {
-    const { data } = yield call(api.post, "/api/users", action.payload);
+    const { data } = yield call(api.post, "/users", action.payload);
     yield put(createUserSuccess(data));
   } catch (e) {
     yield put(createUserFailure(e.message));
@@ -58,7 +59,7 @@ function* createUserWorker(action) {
 function* deleteUserWorker(action) {
   try {
     const id = action.payload;
-    yield call(api.delete, `/api/users/${id}`);
+    yield call(api.delete, `/users/${id}`);
     yield put(deleteUserSuccess(id));
   } catch (e) {
     yield put(deleteUserFailure(e.message));
@@ -69,7 +70,7 @@ function* deleteUserWorker(action) {
 function* fetchAllocationsWorker(action) {
   try {
     const userId = action.payload;
-    const { data } = yield call(api.get, `/api/payroll/${userId}`);
+    const { data } = yield call(api.get, `/payroll/${userId}`);
     yield put(fetchAllocationsSuccess({ userId, allocations: data }));
   } catch (e) {
     yield put(fetchAllocationsFailure(e.message));
@@ -78,7 +79,7 @@ function* fetchAllocationsWorker(action) {
 
 function* createAllocationWorker(action) {
   try {
-    const { data } = yield call(api.post, "/api/payroll", action.payload);
+    const { data } = yield call(api.post, "/payroll", action.payload);
     yield put(createAllocationSuccess({ user: data.user, allocation: data }));
   } catch (e) {
     yield put(createAllocationFailure(e.message));
@@ -88,7 +89,7 @@ function* createAllocationWorker(action) {
 // Payrun
 function* fetchPayrunsWorker() {
   try {
-    const { data } = yield call(api.get, "/api/payrun");
+    const { data } = yield call(api.get, "/payrun");
     yield put(fetchPayrunsSuccess(data));
   } catch (e) {
     yield put(fetchPayrunsFailure(e.message));
@@ -97,11 +98,7 @@ function* fetchPayrunsWorker() {
 
 function* generatePayrunWorker(action) {
   try {
-    const { data } = yield call(
-      api.post,
-      "/api/payrun/generate",
-      action.payload
-    );
+    const { data } = yield call(api.post, "/payrun/generate", action.payload);
     yield put(generatePayrunSuccess(data));
   } catch (e) {
     yield put(generatePayrunFailure(e.message));
@@ -111,7 +108,7 @@ function* generatePayrunWorker(action) {
 function* processPayrunWorker(action) {
   try {
     const id = action.payload;
-    const { data } = yield call(api.post, `/api/payrun/${id}/process`);
+    const { data } = yield call(api.post, `/payrun/${id}/process`);
     yield put(processPayrunSuccess(data));
   } catch (e) {
     yield put(processPayrunFailure(e.message));
