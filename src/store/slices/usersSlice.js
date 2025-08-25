@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  list: [],
+  items: [],
+  pagination: null,
   loading: false,
   error: null
 }
@@ -11,17 +12,28 @@ const usersSlice = createSlice({
   initialState,
   reducers: {
     fetchUsers: (state) => { state.loading = true; state.error = null },
-    fetchUsersSuccess: (state, { payload }) => { state.loading = false; state.list = payload },
+    fetchUsersSuccess: (state, { payload }) => {
+      state.loading = false;
+      state.items = payload?.data || []
+      state.pagination = payload?.pagination || null
+    },
     fetchUsersFailure: (state, { payload }) => { state.loading = false; state.error = payload },
 
     createUser: (state) => { state.loading = true },
-    createUserSuccess: (state, { payload }) => { state.loading = false; state.list.unshift(payload) },
+    createUserSuccess: (state, { payload }) => {
+      state.loading = false;
+      if (payload) {
+        state.items.unshift(payload)
+        if (state.pagination) state.pagination.totalDocs = (state.pagination.totalDocs || 0) + 1
+      }
+    },
     createUserFailure: (state, { payload }) => { state.loading = false; state.error = payload },
 
     deleteUser: (state) => { state.loading = true },
     deleteUserSuccess: (state, { payload }) => {
       state.loading = false;
-      state.list = state.list.filter(u => u._id !== payload)
+      state.items = state.items.filter(u => u._id !== payload)
+      if (state.pagination && state.pagination.totalDocs > 0) state.pagination.totalDocs -= 1
     },
     deleteUserFailure: (state, { payload }) => { state.loading = false; state.error = payload }
   }

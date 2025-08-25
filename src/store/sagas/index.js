@@ -1,10 +1,9 @@
 import { all, call, put, takeLatest } from "redux-saga/effects";
 import axios from "axios";
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_BASE_URL ||
-    "http://localhost:8000" ||
-    "https://hrms-backend-beige.vercel.app/",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  // ||
+  // "https://hrms-backend-beige.vercel.app/",
 });
 import {
   fetchUsers,
@@ -36,11 +35,20 @@ import {
   processPayrunSuccess,
   processPayrunFailure,
 } from "../slices/payrunSlice";
+import {
+  fetchRoles,
+  fetchRolesSuccess,
+  fetchRolesFailure,
+  createRole,
+  createRoleSuccess,
+  createRoleFailure,
+} from "../slices/rolesSlice";
 
 // Users
-function* fetchUsersWorker() {
+function* fetchUsersWorker(action) {
   try {
-    const { data } = yield call(api.get, "/users");
+    const params = action?.payload || { page: 1, limit: 10 };
+    const { data } = yield call(api.get, "/users", { params });
     yield put(fetchUsersSuccess(data));
   } catch (e) {
     yield put(fetchUsersFailure(e.message));
@@ -50,7 +58,11 @@ function* fetchUsersWorker() {
 function* createUserWorker(action) {
   try {
     const { data } = yield call(api.post, "/users", action.payload);
-    yield put(createUserSuccess(data));
+    yield put(createUserSuccess(data?.data || data));
+    const { data: list } = yield call(api.get, "/users", {
+      params: { page: 1, limit: 10 },
+    });
+    yield put(fetchUsersSuccess(list));
   } catch (e) {
     yield put(createUserFailure(e.message));
   }
@@ -63,6 +75,30 @@ function* deleteUserWorker(action) {
     yield put(deleteUserSuccess(id));
   } catch (e) {
     yield put(deleteUserFailure(e.message));
+  }
+}
+
+// Roles
+function* fetchRolesWorker(action) {
+  try {
+    const params = action?.payload || { page: 1, limit: 50 };
+    const { data } = yield call(api.get, "/roles", { params });
+    yield put(fetchRolesSuccess(data));
+  } catch (e) {
+    yield put(fetchRolesFailure(e.message));
+  }
+}
+
+function* createRoleWorker(action) {
+  try {
+    const { data } = yield call(api.post, "/roles", action.payload);
+    yield put(createRoleSuccess(data?.data || data));
+    const { data: list } = yield call(api.get, "/roles", {
+      params: { page: 1, limit: 50 },
+    });
+    yield put(fetchRolesSuccess(list));
+  } catch (e) {
+    yield put(createRoleFailure(e.message));
   }
 }
 
@@ -120,6 +156,9 @@ export default function* rootSaga() {
     takeLatest(fetchUsers.type, fetchUsersWorker),
     takeLatest(createUser.type, createUserWorker),
     takeLatest(deleteUser.type, deleteUserWorker),
+
+    takeLatest(fetchRoles.type, fetchRolesWorker),
+    takeLatest(createRole.type, createRoleWorker),
 
     takeLatest(fetchAllocations.type, fetchAllocationsWorker),
     takeLatest(createAllocation.type, createAllocationWorker),
