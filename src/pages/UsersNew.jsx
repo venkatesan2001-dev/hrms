@@ -15,7 +15,7 @@ export default function UsersNew() {
     lastName: "",
     email: "",
     employeeCode: "",
-    role: "",
+    role: "ADMIN",
   });
 
   useEffect(() => {
