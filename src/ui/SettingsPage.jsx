@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
 import Table from "../components/Table";
+import Button from "../components/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchRoles, createRole } from "../store/slices/rolesSlice";
 import { useLocation } from "react-router-dom";
@@ -124,53 +125,38 @@ export default function SettingsPage() {
           {section === "master" && (
             <div className="master-tabs">
               <div className="section-header" style={{ gap: 12 }}>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button
-                    className={`settings-nav-item ${
-                      masterTab === "departments" ? "active" : ""
-                    }`}
-                    onClick={() => setMasterTab("departments")}
+                <div
+                  className="settings-master-tabs"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 4fr",
+                    gap: 16,
+                    width: "100%",
+                  }}
+                >
+                  <div
+                    className="settings-tabs-column"
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
                   >
-                    Departments
-                  </button>
-                  <button
-                    className={`settings-nav-item ${
-                      masterTab === "roles" ? "active" : ""
-                    }`}
-                    onClick={() => setMasterTab("roles")}
-                  >
-                    Roles
-                  </button>
+                    <button
+                      className={`settings-nav-item ${
+                        masterTab === "departments" ? "active" : ""
+                      }`}
+                      onClick={() => setMasterTab("departments")}
+                    >
+                      Departments
+                    </button>
+                    <button
+                      className={`settings-nav-item ${
+                        masterTab === "roles" ? "active" : ""
+                      }`}
+                      onClick={() => setMasterTab("roles")}
+                    >
+                      Roles
+                    </button>
+                  </div>
                 </div>
-                {masterTab === "departments" && (
-                  <button
-                    className="btn-primary"
-                    onClick={() => setShowDeptModal(true)}
-                  >
-                    New Department
-                  </button>
-                )}
-                {masterTab === "roles" && (
-                  <button
-                    className="btn-primary"
-                    onClick={() => setShowRoleModal(true)}
-                  >
-                    New Role
-                  </button>
-                )}
               </div>
-
-              {masterTab === "departments" && (
-                <Table columns={deptColumns} data={departments} />
-              )}
-
-              {masterTab === "roles" && (
-                <Table
-                  columns={roleColumns}
-                  data={roles}
-                  emptyText={rolesLoading ? "Loading..." : "No roles found"}
-                />
-              )}
             </div>
           )}
 
@@ -185,6 +171,43 @@ export default function SettingsPage() {
             <div className="security-settings">
               <h2>Others</h2>
               <p>Other settings.</p>
+            </div>
+          )}
+        </div>
+        <div className="settings-table-column">
+          {masterTab === "departments" && (
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginBottom: 12,
+                }}
+              >
+                <Button onClick={() => setShowDeptModal(true)}>
+                  New Department
+                </Button>
+              </div>
+              <Table columns={deptColumns} data={departments} />
+            </div>
+          )}
+
+          {masterTab === "roles" && (
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginBottom: 12,
+                }}
+              >
+                <Button onClick={() => setShowRoleModal(true)}>New Role</Button>
+              </div>
+              <Table
+                columns={roleColumns}
+                data={roles}
+                emptyText={rolesLoading ? "Loading..." : "No roles found"}
+              />
             </div>
           )}
         </div>

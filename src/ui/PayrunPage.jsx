@@ -8,7 +8,7 @@ import {
 
 export default function PayrunPage() {
   const dispatch = useDispatch();
-  const { list, loading } = useSelector((s) => s.payrun);
+  const { list = { data: [] }, loading } = useSelector((s) => s.payrun);
   const [form, setForm] = useState({
     periodMonth: new Date().getMonth() + 1,
     periodYear: new Date().getFullYear(),
@@ -52,37 +52,43 @@ export default function PayrunPage() {
 
       <div className="card">
         <h3>Payruns</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Period</th>
-              <th>Status</th>
-              <th>Items</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.data.map((p) => (
-              <tr key={p._id}>
-                <td>
-                  {p.periodMonth}/{p.periodYear}
-                </td>
-                <td>{p.status}</td>
-                <td>{p.items?.length || 0}</td>
-                <td>
-                  {p.status === "DRAFT" && (
-                    <button
-                      onClick={() => dispatch(processPayrun(p._id))}
-                      disabled={loading}
-                    >
-                      Process
-                    </button>
-                  )}
-                </td>
+        {loading ? (
+          <p>Loading payruns...</p>
+        ) : (list?.data || []).length === 0 ? (
+          <p>No payruns found.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Period</th>
+                <th>Status</th>
+                <th>Items</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {(list?.data || []).map((p) => (
+                <tr key={p._id}>
+                  <td>
+                    {p.periodMonth}/{p.periodYear}
+                  </td>
+                  <td>{p.status}</td>
+                  <td>{p.items?.length || 0}</td>
+                  <td>
+                    {p.status === "DRAFT" && (
+                      <button
+                        onClick={() => dispatch(processPayrun(p._id))}
+                        disabled={loading}
+                      >
+                        Process
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Button from "../components/Button";
 import { createUser, deleteUser, fetchUsers } from "../store/slices/usersSlice";
 
 export default function UsersPage() {
@@ -74,7 +75,7 @@ export default function UsersPage() {
             <option value="MANAGER">MANAGER</option>
             <option value="ADMIN">ADMIN</option>
           </select>
-          <button disabled={loading}>Create</button>
+          <Button disabled={loading}>Create</Button>
         </form>
       </div>
 
@@ -111,12 +112,12 @@ export default function UsersPage() {
                   <td>{u.employeeCode}</td>
                   <td>{u.role}</td>
                   <td>
-                    <button
+                    <Button
                       onClick={() => dispatch(deleteUser(u._id))}
                       disabled={loading}
                     >
                       Delete
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
