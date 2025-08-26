@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { createOnboarding } from '../store/slices/onboardingSlice'
 import Button from '../components/Button'
+import Input from '../components/Input'
 
 export default function JoiningFormalitiesPage() {
   const [docFiles, setDocFiles] = useState([])
@@ -24,7 +25,7 @@ export default function JoiningFormalitiesPage() {
       <div className="card">
         <h3>Joining Formalities</h3>
         <form onSubmit={submit} className="row" style={{ flexWrap: 'wrap', gap: 12 }}>
-          <input type="file" multiple onChange={e => setDocFiles(Array.from(e.target.files || []))} />
+          <Input type="file" label="Documents" multiple onChange={e => setDocFiles(Array.from(e.target.files || []))} />
           <div style={{ width: '100%' }}>
             {checklist.map((item, idx) => (
               <label key={item.key} style={{ display: 'inline-flex', gap: 8, marginRight: 16 }}>

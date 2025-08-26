@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createUser } from "../store/slices/usersSlice";
 import { fetchRoles } from "../store/slices/rolesSlice";
+import Input from "../components/Input";
+import Dropdown from "../components/Dropdown";
 
 export default function UsersNew() {
   const dispatch = useDispatch();
@@ -31,47 +33,22 @@ export default function UsersNew() {
   return (
     <div className="card">
       <h3>New User</h3>
-      <form
-        onSubmit={submit}
-        className="row"
-        style={{ flexWrap: "wrap", gap: 12 }}
-      >
-        <input
-          placeholder="First name"
-          value={form.firstName}
-          onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Last name"
-          value={form.lastName}
-          onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Employee Code"
-          value={form.employeeCode}
-          onChange={(e) => setForm({ ...form, employeeCode: e.target.value })}
-          required
-        />
-        <select
+      <form onSubmit={submit} className="row" style={{ flexWrap: "wrap", gap: 12 }}>
+        <Input label="First name" name="firstName" value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required />
+        <Input label="Last name" name="lastName" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required />
+        <Input type="email" label="Email" name="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+        <Input label="Employee Code" name="employeeCode" value={form.employeeCode} onChange={(e) => setForm({ ...form, employeeCode: e.target.value })} required />
+        <Dropdown
+          label="Role"
+          name="role"
           value={form.role}
           onChange={(e) => setForm({ ...form, role: e.target.value })}
-        >
-          <option value="">Select Role</option>
-          {roles.map((r) => (
-            <option key={r._id} value={r.name}>
-              {r.name}
-            </option>
-          ))}
-        </select>
+          data={roles.map((r) => ({ label: r.name, value: r.name }))}
+          displayName="label"
+          displayValue="value"
+          searchFields={["label"]}
+          placeholder="Select Role"
+        />
         <div style={{ display: "flex", gap: 8 }}>
           <button
             className="btn-secondary"

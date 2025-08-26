@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProbations, createProbation } from '../store/slices/probationSlice'
 import Button from '../components/Button'
+import Input from '../components/Input'
+import Table from '../components/Table'
 
 export default function ProbationPage() {
   const [startDate, setStartDate] = useState('')
@@ -24,36 +26,26 @@ export default function ProbationPage() {
       <div className="card">
         <h3>Probation & Confirmation</h3>
         <form onSubmit={create} className="row" style={{ flexWrap: 'wrap', gap: 12 }}>
-          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
-          <input type="number" value={durationDays} onChange={e => setDurationDays(Number(e.target.value))} />
+          <Input type="date" label="Start Date" name="startDate" value={startDate} onChange={e => setStartDate(e.target.value)} />
+          <Input type="number" label="Duration (days)" name="durationDays" value={durationDays} onChange={e => setDurationDays(Number(e.target.value))} />
           <Button disabled={loading}>Create Probation</Button>
         </form>
       </div>
       <div className="card">
         <h3>Probation Records</h3>
-        <div className="enhanced-table">
-          <table>
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 && (<tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, color: '#64748b' }}>{loading ? 'Loading...' : 'No records'}</td></tr>)}
-              {items.map(p => (
-                <tr key={p._id}>
-                  <td>{p.userId}</td>
-                  <td>{new Date(p.startDate).toLocaleDateString()}</td>
-                  <td>{new Date(p.endDate).toLocaleDateString()}</td>
-                  <td>{p.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          enableColumnPicker
+          enableResize
+          statusKey="status"
+          columns={[
+            { header: 'User', accessor: 'userId' },
+            { header: 'Start', key: 'start', render: (p) => new Date(p.startDate).toLocaleDateString() },
+            { header: 'End', key: 'end', render: (p) => new Date(p.endDate).toLocaleDateString() },
+            { header: 'Status', accessor: 'status', status: true },
+          ]}
+          data={items}
+          emptyText={loading ? 'Loading...' : 'No records'}
+        />
       </div>
     </div>
   )

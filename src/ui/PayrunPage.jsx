@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Input from "../components/Input";
+import Table from "../components/Table";
 import {
   fetchPayruns,
   generatePayrun,
@@ -33,19 +35,8 @@ export default function PayrunPage() {
       <div className="card">
         <h3>Generate Payrun</h3>
         <form className="row" onSubmit={submit}>
-          <input
-            type="number"
-            min="1"
-            max="12"
-            value={form.periodMonth}
-            onChange={(e) => setForm({ ...form, periodMonth: e.target.value })}
-          />
-          <input
-            type="number"
-            min="2000"
-            value={form.periodYear}
-            onChange={(e) => setForm({ ...form, periodYear: e.target.value })}
-          />
+          <Input type="number" name="periodMonth" label="Month" min="1" max="12" value={form.periodMonth} onChange={(e) => setForm({ ...form, periodMonth: e.target.value })} />
+          <Input type="number" name="periodYear" label="Year" min="2000" value={form.periodYear} onChange={(e) => setForm({ ...form, periodYear: e.target.value })} />
           <button disabled={loading}>Generate</button>
         </form>
       </div>
@@ -57,37 +48,19 @@ export default function PayrunPage() {
         ) : (list?.data || []).length === 0 ? (
           <p>No payruns found.</p>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Period</th>
-                <th>Status</th>
-                <th>Items</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(list?.data || []).map((p) => (
-                <tr key={p._id}>
-                  <td>
-                    {p.periodMonth}/{p.periodYear}
-                  </td>
-                  <td>{p.status}</td>
-                  <td>{p.items?.length || 0}</td>
-                  <td>
-                    {p.status === "DRAFT" && (
-                      <button
-                        onClick={() => dispatch(processPayrun(p._id))}
-                        disabled={loading}
-                      >
-                        Process
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table
+            columns={[
+              { header: "Period", key: "period", render: (p) => `${p.periodMonth}/${p.periodYear}` },
+              { header: "Status", accessor: "status" },
+              { header: "Items", render: (p) => p.items?.length || 0 },
+              { header: "Action", render: (p) => (
+                p.status === "DRAFT" ? (
+                  <button onClick={() => dispatch(processPayrun(p._id))} disabled={loading}>Process</button>
+                ) : null
+              )},
+            ]}
+            data={(list?.data || [])}
+          />
         )}
       </div>
     </div>

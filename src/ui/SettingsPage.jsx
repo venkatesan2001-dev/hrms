@@ -19,10 +19,38 @@ export default function SettingsPage() {
 
   const [section, setSection] = useState(initialSection);
   const [masterTab, setMasterTab] = useState("departments");
+  const [themeColor, setThemeColor] = useState('#10b981');
 
   useEffect(() => {
     setSection(initialSection);
   }, [initialSection]);
+  useEffect(() => {
+    // fetch theme color
+    fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/settings/theme`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (res && res.color) {
+          setThemeColor(res.color);
+          document.documentElement.style.setProperty('--sidebar-color', res.color);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const saveTheme = (e) => {
+    e.preventDefault();
+    fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/settings/theme`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ color: themeColor })
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        const color = res?.color || themeColor;
+        document.documentElement.style.setProperty('--sidebar-color', color);
+      })
+      .catch(() => {});
+  }
 
   const [departments, setDepartments] = useState([]);
 
@@ -171,6 +199,17 @@ export default function SettingsPage() {
             <div className="security-settings">
               <h2>Others</h2>
               <p>Other settings.</p>
+              <div className="card" style={{ marginTop: 16 }}>
+                <h3>Theme</h3>
+                <form onSubmit={saveTheme} style={{ display: 'grid', gap: 12, maxWidth: 360 }}>
+                  <label>Sidebar color</label>
+                  <input type="color" value={themeColor} onChange={(e) => setThemeColor(e.target.value)} />
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button type="submit" className="btn-primary">Save</button>
+                    <button type="button" className="btn-secondary" onClick={() => document.documentElement.style.setProperty('--sidebar-color', themeColor)}>Preview</button>
+                  </div>
+                </form>
+              </div>
             </div>
           )}
         </div>

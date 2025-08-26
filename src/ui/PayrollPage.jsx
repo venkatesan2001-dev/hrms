@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../store/slices/usersSlice";
-import {
-  createAllocation,
-  fetchAllocations,
-} from "../store/slices/payrollSlice";
+import { createAllocation, fetchAllocations } from "../store/slices/payrollSlice";
+import Input from "../components/Input";
+import Dropdown from "../components/Dropdown";
+import Table from "../components/Table";
 
 export default function PayrollPage() {
   const dispatch = useDispatch();
@@ -45,65 +45,26 @@ export default function PayrollPage() {
       <div className="card">
         <h3>Allocate Payroll</h3>
         <div className="row" style={{ marginBottom: 12 }}>
-          <select
+          <Dropdown
+            label="Select user"
+            name="user"
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
-          >
-            <option value="">Select user</option>
-            {(users?.data || []).map((u) => (
-              <option key={u._id} value={u._id}>
-                {u.firstName} {u.lastName}
-              </option>
-            ))}
-          </select>
+            data={(users?.data || []).map((u) => ({ name: `${u.firstName} ${u.lastName}`, value: u._id }))}
+            displayName="name"
+            displayValue="value"
+            searchFields={["name"]}
+            placeholder="Select user"
+          />
         </div>
         {!!selectedUser && (
-          <form
-            className="row"
-            onSubmit={submit}
-            style={{ flexWrap: "wrap", gap: 12 }}
-          >
-            <input
-              type="number"
-              placeholder="CTC"
-              onChange={(e) =>
-                setForm({ ...form, ctc: Number(e.target.value) })
-              }
-            />
-            <input
-              type="number"
-              placeholder="Basic"
-              onChange={(e) =>
-                setForm({ ...form, basic: Number(e.target.value) })
-              }
-            />
-            <input
-              type="number"
-              placeholder="HRA"
-              onChange={(e) =>
-                setForm({ ...form, hra: Number(e.target.value) })
-              }
-            />
-            <input
-              type="number"
-              placeholder="Allowances"
-              onChange={(e) =>
-                setForm({ ...form, allowances: Number(e.target.value) })
-              }
-            />
-            <input
-              type="number"
-              placeholder="Deductions"
-              onChange={(e) =>
-                setForm({ ...form, deductions: Number(e.target.value) })
-              }
-            />
-            <input
-              type="date"
-              onChange={(e) =>
-                setForm({ ...form, effectiveFrom: e.target.value })
-              }
-            />
+          <form className="row" onSubmit={submit} style={{ flexWrap: "wrap", gap: 12 }}>
+            <Input type="number" name="ctc" label="CTC" placeholder="CTC" onChange={(e) => setForm({ ...form, ctc: Number(e.target.value) })} />
+            <Input type="number" name="basic" label="Basic" placeholder="Basic" onChange={(e) => setForm({ ...form, basic: Number(e.target.value) })} />
+            <Input type="number" name="hra" label="HRA" placeholder="HRA" onChange={(e) => setForm({ ...form, hra: Number(e.target.value) })} />
+            <Input type="number" name="allowances" label="Allowances" placeholder="Allowances" onChange={(e) => setForm({ ...form, allowances: Number(e.target.value) })} />
+            <Input type="number" name="deductions" label="Deductions" placeholder="Deductions" onChange={(e) => setForm({ ...form, deductions: Number(e.target.value) })} />
+            <Input type="date" name="effectiveFrom" label="Effective From" onChange={(e) => setForm({ ...form, effectiveFrom: e.target.value })} />
             <button disabled={payroll.loading}>Save Allocation</button>
           </form>
         )}
@@ -117,30 +78,17 @@ export default function PayrollPage() {
           ) : allocations.length === 0 ? (
             <p>No allocations found for this user.</p>
           ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th>Effective From</th>
-                  <th>CTC</th>
-                  <th>Basic</th>
-                  <th>HRA</th>
-                  <th>Allowances</th>
-                  <th>Deductions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allocations.map((a) => (
-                  <tr key={a._id}>
-                    <td>{new Date(a.effectiveFrom).toLocaleDateString()}</td>
-                    <td>{a.ctc}</td>
-                    <td>{a.basic}</td>
-                    <td>{a.hra}</td>
-                    <td>{a.allowances}</td>
-                    <td>{a.deductions}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <Table
+              columns={[
+                { header: "Effective From", key: "effectiveFrom", render: (a) => new Date(a.effectiveFrom).toLocaleDateString() },
+                { header: "CTC", accessor: "ctc" },
+                { header: "Basic", accessor: "basic" },
+                { header: "HRA", accessor: "hra" },
+                { header: "Allowances", accessor: "allowances" },
+                { header: "Deductions", accessor: "deductions" },
+              ]}
+              data={allocations}
+            />
           )}
         </div>
       )}

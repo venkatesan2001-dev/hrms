@@ -12,8 +12,6 @@ export default function UsersIndex() {
     dispatch(fetchUsers({ page: 1, limit: 10 }));
   }, [dispatch]);
 
-  console.log(import.meta.env.VITE_API_BASE_URL, "ENV");
-
   const columns = [
     {
       header: "Name",
